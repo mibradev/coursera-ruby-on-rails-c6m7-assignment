@@ -6,6 +6,9 @@
     .component("sdNewThings", {
       templateUrl: thingsTemplateUrl,
       controller: CurrentThingsController,
+      require: {
+         areas: "^sdAreas"
+      }
     })
     .component("sdCurrentThingInfo", {
       templateUrl: thingInfoTemplateUrl,
@@ -23,8 +26,9 @@
   }
 
   CurrentThingsController.$inject = ["$scope",
-                                     "spa-demo.subjects.currentSubjects"];
-  function CurrentThingsController($scope,currentSubjects) {
+                                     "spa-demo.subjects.currentSubjects",
+                                     "spa-demo.subjects.ImageThing"];
+  function CurrentThingsController($scope,currentSubjects, ImageThing) {
     var vm=this;
     vm.thingClicked = thingClicked;
     vm.isCurrentThing = currentSubjects.isCurrentThingIndex;
@@ -34,8 +38,14 @@
     }
     vm.$postLink = function() {
       $scope.$watch(
-        function() { return currentSubjects.getThings(); },
-        function(things) { vm.things = things; }
+        function() { return currentSubjects.getCurrentImageIndex(); },
+        function(image_id) {
+          if (image_id) {
+            vm.things = ImageThing.query({ image_id: image_id });
+          } else {
+            vm.things = null;
+          }
+        }
       );
     }
     return;
